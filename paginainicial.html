@@ -195,10 +195,17 @@ const uid = user.uid;
                 window.location.href = "ranking.html";
             } else {
                 userRef.update({ pontuacao: total })
-                .then(() => {
-                    alert("Pontuação salva com sucesso!");
-                    window.location.href = "ranking.html";
-                });
+.then(() => {
+
+    // 🔹 salva também no ranking público
+    db.ref("ranking/" + uid).set({
+        nome: nome,
+        pontuacao: total
+    });
+
+    alert("Pontuação salva com sucesso!");
+    window.location.href = "ranking.html";
+});
             }
         } else {
     userRef.set({
@@ -220,6 +227,7 @@ const uid = user.uid;
 
 </body>
 </html>
+
 
 
 
