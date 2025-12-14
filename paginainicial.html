@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bag</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #0a4cff, #78aaff);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        color: white;
+    }
+
+    h1 { text-align: center; padding: 25px 0 5px; font-size: 40px; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    h2 { text-align: center; font-weight: 300; margin-bottom: 25px; font-size: 20px; }
+    .container { max-width: 1600px; margin: auto; padding: 20px; }
+    .flex { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; justify-content: center; }
+    .box {
+        flex: 1 1 450px; max-width: 700px; min-height: 500px;
+        background: rgba(255,255,255,0.25); padding: 25px; border-radius: 15px;
+        backdrop-filter: blur(4px); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex; flex-direction: column;
+    }
+    h3 { text-align: center; margin: 0 0 15px; font-size: 22px; font-weight: bold; }
+    .words-container, .drop-zone {
+        flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        grid-auto-rows: 40px; gap: 8px;
+    }
+    .word {
+        background: rgba(255,255,255,0.9); border-radius: 8px; display: flex;
+        justify-content: center; align-items: center; font-weight: 600; font-size: 11px;
+        padding: 0 4px; cursor: grab; user-select: none; color: #003b8a; transition: 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .word:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 2px solid #4CAF50; }
+    .drop-zone { border: 2px dashed rgba(255,255,255,0.6); border-radius: 12px; padding: 10px; }
+    .drop-zone.over { background: rgba(255,255,255,0.2); border-color: #fff; transform: scale(1.01); transition: 0.2s; }
+    .counter { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+    button { margin-top: 20px; background: #4CAF50; border: none; padding: 14px 26px; border-radius: 10px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; align-self: flex-end; }
+    button:hover { background: #3da043; }
+</style>
+</head>
+
+<body>
+
+<h1>My Bag</h1>
+<h2>Descubra o tanto de vocabulário que você já sabe!</h2>
+
+<div class="container">
+    <div class="flex">
+
+        <div class="box">
+            <h3>Palavras</h3>
+            <div class="words-container" id="leftBox"></div>
+        </div>
+
+        <div class="box">
+            <div class="counter">Total: <span id="count">0</span></div>
+            <div class="drop-zone" id="rightBox"></div>
+            <button onclick="enviar()">Enviar</button>
+        </div>
+
+    </div>
+</div>
+
+<audio id="sound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+
+<script>
+if (localStorage.getItem("finalizado") === "true") {
+    alert("Você já completou este jogo antes. Pode jogar novamente, mas sua primeira pontuação continua valendo.");
+}
+
+const words = [
+"hang out","can","thursday","doctor","japan","stepfather","teacher","wednesday","pretty","leave",
+"engineer","answer","germany","nurse","tuesday","write","lost","artist","canada","uk",
+"see you","hey","come","found","chef","mexico","have","driver","turkey","thing",
+"purse","student","italy","handsome","soccer","friday","spell","his","polish","spain",
+"hello","goodbye","morning","evening","apple","banana","book","phone","happy","sad",
+"run","walk","eat","drink","sleep","house","car","bike","bus","train",
+"city","village","small","big","fast","slow","hot","cold","water","air",
+"family","mother","father","sister","brother","friend","work","play","study","school",
+"money","pay","buy","sell","open","close","start","finish","listen","speak",
+"read","write","think","know","understand","question","answer","game","music","movie"
+];
+
+const leftBox = document.getElementById("leftBox");
+const rightBox = document.getElementById("rightBox");
+const count = document.getElementById("count");
+const sound = document.getElementById("sound");
+
+words.forEach(w=>{
+    const div = document.createElement("div");
+    div.className = "word";
+    div.draggable = true;
+    div.textContent = w;
+    div.addEventListener("dragstart", e=>{
+        e.dataTransfer.setData("text/plain", w);
+    });
+    leftBox.appendChild(div);
+});
+
+rightBox.addEventListener("dragover", e=>{
+    e.preventDefault();
+    rightBox.classList.add("over");
+});
+rightBox.addEventListener("dragleave", ()=> rightBox.classList.remove("over"));
+rightBox.addEventListener("drop", e=>{
+    e.preventDefault();
+    rightBox.classList.remove("over");
+
+    const word = e.dataTransfer.getData("text/plain");
+
+    [...leftBox.children].forEach(w=>{
+        if (w.textContent === word) w.remove();
+    });
+
+    const exists = [...rightBox.children].some(w=>w.textContent === word);
+    if (exists) return;
+
+    const div = document.createElement("div");
+    div.className = "word";
+    div.textContent = word;
+    rightBox.appendChild(div);
+
+    sound.currentTime = 0;
+    sound.play();
+
+    count.textContent = rightBox.children.length;
+});
+</script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD5Ap61aZ5HMNHeXy5AhyPiWr_eKj90Ess",
+  authDomain: "my-bag-5ae91.firebaseapp.com",
+  projectId: "my-bag-5ae91",
+  storageBucket: "my-bag-5ae91.firebasestorage.app",
+  messagingSenderId: "956913847144",
+  appId: "1:956913847144:web:09858ea246e2694b38e4dd"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) {
+    window.location.href = "login.html";
+  }
+});
+
+// Função para salvar pontuação e garantir redirecionamento
+function enviar() {
+    const total = rightBox.children.length;
+    const uid = localStorage.getItem("uid");
+    const nome = localStorage.getItem("nome") || "Usuário";
+
+    if (!uid) {
+        alert("Usuário não logado!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const db = firebase.database();
+    const userRef = db.ref("usuarios/" + uid);
+
+    userRef.get()
+    .then(snapshot => {
+        if (snapshot.exists()) {
+            const usuario = snapshot.val();
+
+            if (usuario.pontuacao > 0) {
+                alert("Sua primeira pontuação já foi registrada. Esta tentativa é apenas para treino.");
+                window.location.href = "ranking.html";
+            } else {
+                userRef.update({ pontuacao: total })
+                .then(() => {
+                    alert("Pontuação salva com sucesso!");
+                    window.location.href = "ranking.html";
+                });
+            }
+        } else {
+            alert("Usuário não encontrado no banco de dados!");
+        }
+    })
+    .catch(error => {
+        alert("Erro ao acessar Firebase: " + error.message);
+    });
+}
+
+</script>
+
+</body>
+</html>

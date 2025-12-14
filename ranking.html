@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking - My Bag</title>
+
+<style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: linear-gradient(135deg, #0a4cff, #78aaff); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; min-height: 100vh; }
+    h1 { text-align: center; padding: 25px 0 10px; font-size: 38px; margin: 0; }
+    h2 { text-align: center; font-weight: 300; margin: 0 0 25px; font-size: 18px; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 12px; text-align: center; font-size: 18px; color: #003b8a; background: rgba(255,255,255,0.85); font-weight: bold; }
+    th { background: rgba(255,255,255,0.95); color: #002b66; }
+    tbody tr:nth-child(even) td { background: rgba(255,255,255,0.75); }
+    .gold { color: gold; font-size: 22px; }
+    .silver { color: silver; font-size: 22px; }
+    .bronze { color: #cd7f32; font-size: 22px; }
+    button { margin-top: 25px; background: #4CAF50; border: none; padding: 14px 26px; border-radius: 10px; color: white; font-size: 20px; cursor: pointer; display: block; margin-left: auto; margin-right: auto; font-weight: bold; }
+    button:hover { background: #3da043; }
+    #popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    #popup-content { background: white; color: black; padding: 30px; border-radius: 12px; width: 80%; max-width: 400px; text-align: center; }
+    #popup button { margin-top: 20px; }
+</style>
+</head>
+
+<body>
+
+<h1>Ranking</h1>
+<h2>Veja sua posição entre os participantes!</h2>
+
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Nome</th>
+                <th>Pontos</th>
+            </tr>
+        </thead>
+        <tbody id="rankingList"></tbody>
+    </table>
+
+    <button onclick="abrirPopup()">Ver minha pontuação</button>
+</div>
+
+<div id="popup">
+    <div id="popup-content">
+        <h3 id="popupMessage"></h3>
+        <button onclick="fecharPopup()">Fechar</button>
+    </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD5Ap61aZ5HMNHeXy5AhyPiWr_eKj90Ess",
+  authDomain: "my-bag-5ae91.firebaseapp.com",
+  projectId: "my-bag-5ae91",
+  storageBucket: "my-bag-5ae91.firebasestorage.app",
+  messagingSenderId: "956913847144",
+  appId: "1:956913847144:web:09858ea246e2694b38e4dd"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUserUid = localStorage.getItem("uid");
+
+if (!currentUserUid) {
+    // Redireciona se não estiver logado
+    window.location.href = "login.html";
+}
+
+// Função para carregar ranking do Firebase
+function carregarRanking() {
+    db.ref("usuarios").once("value").then(snapshot => {
+        const usersData = snapshot.val();
+        if (!usersData) return;
+
+        let rankingArray = Object.values(usersData).map(u => ({
+            nome: u.nome,
+            pontuacao: u.pontuacao || 0
+        }));
+
+        // Ordena por pontuação decrescente
+        rankingArray.sort((a, b) => b.pontuacao - a.pontuacao);
+
+        const rankingList = document.getElementById("rankingList");
+        rankingList.innerHTML = "";
+
+        rankingArray.forEach((user, index) => {
+            const tr = document.createElement("tr");
+
+            let medal = "";
+            if (index === 0) medal = "<span class='gold'>🥇</span>";
+            if (index === 1) medal = "<span class='silver'>🥈</span>";
+            if (index === 2) medal = "<span class='bronze'>🥉</span>";
+
+            tr.innerHTML = `
+                <td>${medal} ${index + 1}</td>
+                <td>${user.nome}</td>
+                <td>${user.pontuacao}</td>
+            `;
+
+            rankingList.appendChild(tr);
+        });
+    });
+}
+
+// POPUP com pontuação do usuário atual
+function abrirPopup() {
+    db.ref("usuarios/" + currentUserUid).once("value").then(snapshot => {
+        const user = snapshot.val();
+        const score = user ? user.pontuacao : 0;
+        document.getElementById("popupMessage").textContent =
+            `Você marcou um total de ${score} pontos!`;
+        document.getElementById("popup").style.display = "flex";
+    });
+}
+
+function fecharPopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+// Carrega o ranking ao abrir a página
+carregarRanking();
+</script>
+
+</body>
+</html>

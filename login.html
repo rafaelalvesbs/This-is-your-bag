@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bag</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", Arial, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: #003058;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+            background: white; 
+            border-radius: 18px;
+            padding: 35px 28px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            font-size: 14px;
+            color: #000;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #c7ddff;
+            font-size: 15px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6fb7ff, #5ca8ff);
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 14px;
+            min-height: 20px;
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <div class="title">Bem-vindo</div>
+
+    <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Digite seu email" />
+    </div>
+
+    <div class="field">
+        <label>Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" />
+    </div>
+
+    <button class="btn-login" onclick="logar()">Entrar</button>
+
+    <!-- Link Criar conta -->
+    <div style="text-align: right; margin-top: 8px;">
+        <a href="cadastro.html" style="color: black; text-decoration: none;">Criar conta</a>
+    </div>
+
+    <div class="msg" id="msg"></div>
+</div>
+
+
+<!-- 🔥 Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD5Ap61aZ5HMNHeXy5AhyPiWr_eKj90Ess",
+  authDomain: "my-bag-5ae91.firebaseapp.com",
+  projectId: "my-bag-5ae91",
+  storageBucket: "my-bag-5ae91.firebasestorage.app",
+  messagingSenderId: "956913847144",
+  appId: "1:956913847144:web:09858ea246e2694b38e4dd"
+};
+
+// Inicializa Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+function logar() {
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+    const msg = document.getElementById("msg");
+
+    if (!email || !senha) {
+        msg.textContent = "Preencha todos os campos.";
+        msg.style.color = "#e63946";
+        return;
+    }
+
+    auth.signInWithEmailAndPassword(email, senha)
+        .then(() => {
+            msg.textContent = "Login efetuado!";
+            msg.style.color = "#000";
+
+            setTimeout(() => {
+                window.location.href = "paginainicial.html";
+            }, 800);
+        })
+        .catch(() => {
+            msg.textContent = "Email ou senha inválidos.";
+            msg.style.color = "#e63946";
+        });
+}
+</script>
+
+</body>
+</html>
