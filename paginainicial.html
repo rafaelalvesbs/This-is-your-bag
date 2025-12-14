@@ -201,8 +201,15 @@ const uid = user.uid;
                 });
             }
         } else {
-            alert("Usuário não encontrado no banco de dados!");
-        }
+    userRef.set({
+        nome: nome,
+        pontuacao: total
+    }).then(() => {
+        alert("Pontuação salva com sucesso!");
+        window.location.href = "ranking.html";
+    });
+}
+
     })
     .catch(error => {
         alert("Erro ao acessar Firebase: " + error.message);
@@ -213,6 +220,7 @@ const uid = user.uid;
 
 </body>
 </html>
+
 
 
 
