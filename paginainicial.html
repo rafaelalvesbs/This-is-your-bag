@@ -174,8 +174,6 @@ if (!user) {
 
 const uid = user.uid;
 
-    const nome = localStorage.getItem("nome") || "Usuário";
-
     if (!uid) {
         alert("Usuário não logado!");
         window.location.href = "login.html";
@@ -199,9 +197,9 @@ const uid = user.uid;
 
     // 🔹 salva também no ranking público
     db.ref("ranking/" + uid).set({
-        nome: nome,
-        pontuacao: total
-    });
+    nome: usuario.nome || "Usuário",
+    pontuacao: total
+});
 
     alert("Pontuação salva com sucesso!");
     window.location.href = "ranking.html";
@@ -209,9 +207,9 @@ const uid = user.uid;
             }
         } else {
     userRef.set({
-        nome: nome,
-        pontuacao: total
-    }).then(() => {
+    nome: "Usuário",
+    pontuacao: total
+}).then(() => {
         alert("Pontuação salva com sucesso!");
         window.location.href = "ranking.html";
     });
@@ -227,6 +225,7 @@ const uid = user.uid;
 
 </body>
 </html>
+
 
 
 
