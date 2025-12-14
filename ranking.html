@@ -81,7 +81,7 @@ if (!currentUserUid) {
 
 // Função para carregar ranking do Firebase
 function carregarRanking() {
-    db.ref("usuarios").once("value").then(snapshot => {
+    db.ref("ranking").once("value").then(snapshot => {
         const usersData = snapshot.val();
         if (!usersData) return;
 
@@ -136,3 +136,4 @@ carregarRanking();
 
 </body>
 </html>
+
