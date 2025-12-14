@@ -164,7 +164,16 @@ firebase.auth().onAuthStateChanged(user => {
 // Função para salvar pontuação e garantir redirecionamento
 function enviar() {
     const total = rightBox.children.length;
-    const uid = localStorage.getItem("uid");
+    const user = firebase.auth().currentUser;
+
+if (!user) {
+    alert("Usuário não autenticado.");
+    window.location.href = "login.html";
+    return;
+}
+
+const uid = user.uid;
+
     const nome = localStorage.getItem("nome") || "Usuário";
 
     if (!uid) {
@@ -204,5 +213,6 @@ function enviar() {
 
 </body>
 </html>
+
 
 
